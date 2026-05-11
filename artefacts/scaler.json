@@ -1,0 +1,149 @@
+{
+  "description": "IQR scaler fitted on combined benign traffic from CIC-IDS2017, CSE-CIC-IDS2018, and UNSW-NB15 (600,000 samples per dataset, 1,800,000 total). Transformation: z = (x - Q2) / (Q3 - Q1), clipped to [-10, 10].",
+  "n_features": 18,
+  "feature_names": [
+    "bwd_avg_bytes_bulk",
+    "bwd_iat_mean",
+    "bwd_iat_std",
+    "bwd_packet_length_mean",
+    "bwd_packet_length_std",
+    "bwd_packets_s",
+    "destination_port",
+    "flow_bytes_s",
+    "flow_duration",
+    "fwd_avg_bytes_bulk",
+    "fwd_avg_packets_bulk",
+    "fwd_iat_mean",
+    "fwd_iat_min",
+    "fwd_iat_std",
+    "fwd_packet_length_mean",
+    "init_win_bytes_backward",
+    "init_win_bytes_forward",
+    "subflow_fwd_bytes"
+  ],
+  "clip_range": [
+    -10,
+    10
+  ],
+  "training_data": {
+    "datasets": [
+      "CIC-IDS2017",
+      "CSE-CIC-IDS2018",
+      "UNSW-NB15"
+    ],
+    "samples_per_dataset": 600000,
+    "total_samples": 1800000,
+    "split": "80% train / 20% val",
+    "label": "benign only"
+  },
+  "parameters": {
+    "bwd_avg_bytes_bulk": {
+      "Q1": 0.0,
+      "Q2": 0.0,
+      "Q3": 1.0,
+      "IQR": 1.0
+    },
+    "bwd_iat_mean": {
+      "Q1": 0.0,
+      "Q2": 0.55698377,
+      "Q3": 5.17426491,
+      "IQR": 5.17426491
+    },
+    "bwd_iat_std": {
+      "Q1": 0.0,
+      "Q2": 0.0,
+      "Q3": 1717.92932129,
+      "IQR": 1717.92932129
+    },
+    "bwd_packet_length_mean": {
+      "Q1": 3.89182019,
+      "Q2": 4.54329491,
+      "Q3": 5.4243207,
+      "IQR": 1.53250051
+    },
+    "bwd_packet_length_std": {
+      "Q1": 0.0,
+      "Q2": 0.0,
+      "Q3": 30.0,
+      "IQR": 30.0
+    },
+    "bwd_packets_s": {
+      "Q1": 0.8477143,
+      "Q2": 115.95211792,
+      "Q3": 122586.75,
+      "IQR": 122585.8984375
+    },
+    "destination_port": {
+      "Q1": 53.0,
+      "Q2": 143.0,
+      "Q3": 6881.0,
+      "IQR": 6828.0
+    },
+    "flow_bytes_s": {
+      "Q1": 6.19574165,
+      "Q2": 9.59122086,
+      "Q3": 13.18507862,
+      "IQR": 6.98933697
+    },
+    "flow_duration": {
+      "Q1": 0.25018385,
+      "Q2": 5.73334122,
+      "Q3": 12.46738338,
+      "IQR": 12.21719933
+    },
+    "fwd_avg_bytes_bulk": {
+      "Q1": 0.0,
+      "Q2": 0.0,
+      "Q3": 1.0,
+      "IQR": 1.0
+    },
+    "fwd_avg_packets_bulk": {
+      "Q1": 0.0,
+      "Q2": 0.0,
+      "Q3": 1.0,
+      "IQR": 1.0
+    },
+    "fwd_iat_mean": {
+      "Q1": 0.21118675,
+      "Q2": 2.25385714,
+      "Q3": 10.32761765,
+      "IQR": 10.11643124
+    },
+    "fwd_iat_min": {
+      "Q1": 0.0,
+      "Q2": 0.000664,
+      "Q3": 49.0,
+      "IQR": 49.0
+    },
+    "fwd_iat_std": {
+      "Q1": 0.0,
+      "Q2": 13.10465622,
+      "Q3": 9530.81835938,
+      "IQR": 9530.81835938
+    },
+    "fwd_packet_length_mean": {
+      "Q1": 3.46573591,
+      "Q2": 4.00125408,
+      "Q3": 4.36786413,
+      "IQR": 0.90212822
+    },
+    "init_win_bytes_backward": {
+      "Q1": -1.0,
+      "Q2": 60.0,
+      "Q3": 255.0,
+      "IQR": 256.0
+    },
+    "init_win_bytes_forward": {
+      "Q1": 0.0,
+      "Q2": 255.0,
+      "Q3": 5576.0,
+      "IQR": 5576.0
+    },
+    "subflow_fwd_bytes": {
+      "Q1": 3.0,
+      "Q2": 30.0,
+      "Q3": 97.0,
+      "IQR": 94.0
+    }
+  }
+}
