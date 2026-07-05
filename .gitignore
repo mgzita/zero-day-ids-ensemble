@@ -1,0 +1,13 @@
+﻿artefacts_v2/*.pt
+artefacts_v2/test_*.npz
+artefacts_v2/train.npz
+artefacts_v2/val.npz
+artefacts_multiseed/
+artefacts_lodo/
+artefacts_v2_backup/
+data/
+__pycache__/
+*.pyc
+*.log
+pipeline_log*.txt
+artefacts_v2/checkpoints/
