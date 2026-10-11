@@ -1,0 +1,16 @@
+strategy,seed,BoT_IoT_DR,tau
+zero_fill,42,0.7507,0.3749
+zero_fill,123,0.7348,0.3874
+zero_fill,456,0.5033,0.3877
+zero_fill,789,0.893,0.3339
+zero_fill,999,0.727,0.3919
+median_fill,42,0.7507,0.3749
+median_fill,123,0.7348,0.3874
+median_fill,456,0.5033,0.3877
+median_fill,789,0.893,0.3339
+median_fill,999,0.727,0.3919
+feature_removal,42,0.9995,0.38
+feature_removal,123,0.9073,0.3801
+feature_removal,456,0.696,0.3749
+feature_removal,789,0.4962,0.3758
+feature_removal,999,0.9073,0.3768

@@ -1,4 +1,4 @@
-"""
+﻿"""
 Generate anomaly score distribution plots for all 5 datasets.
 
 Run from project root:
@@ -52,16 +52,16 @@ TON_IOT_RENAME = {
 
 DATASETS = [
     {"name": "CIC-IDS2017", "label": "CIC-IDS2017\n(same-domain)",
-     "path": r"C:/MLProject/zero_day_project/artefacts_v2/test_cic17.npz",
+     "path": r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_cic17_dedup.npz",
      "type": "npz", "color_benign": "#2471A3", "color_attack": "#C0392B", "has_benign": True},
     {"name": "CSE-CIC-IDS2018", "label": "CSE-CIC-IDS2018\n(same-domain)",
-     "path": r"C:/MLProject/zero_day_project/artefacts_v2/test_cic18.npz",
+     "path": r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_cic18_dedup.npz",
      "type": "npz", "color_benign": "#2471A3", "color_attack": "#C0392B", "has_benign": True},
     {"name": "UNSW-NB15", "label": "UNSW-NB15\n(same-domain)",
-     "path": r"C:/MLProject/zero_day_project/artefacts_v2/test_unsw.npz",
+     "path": r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_unsw_dedup.npz",
      "type": "npz", "color_benign": "#2471A3", "color_attack": "#C0392B", "has_benign": True},
     {"name": "BoT-IoT", "label": "BoT-IoT\n(unseen zero-day)",
-     "path": r"C:/MLProject/zero_day_project/artefacts_v2/test_botiot.npz",
+     "path": r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_botiot_dedup.npz",
      "type": "npz", "color_benign": "#2471A3", "color_attack": "#C0392B", "has_benign": False},
     {"name": "CIC-ToN-IoT", "label": "CIC-ToN-IoT\n(unseen zero-day)",
      "path": r"C:/MLProject/zero_day_project/data/raw/cic_ton_iot/CIC-ToN-IoT.csv",
@@ -137,9 +137,9 @@ def plot_kde(ax, scores, color, label, alpha=0.55, lw=2):
 
 def run():
     log.info("Loading models ...")
-    ae = Autoencoder().load(os.path.join(ARTEFACT_DIR, "ae_model.pt"))
-    vae = VAE().load(os.path.join(ARTEFACT_DIR, "vae_model.pt"))
-    svdd = DeepSVDD().load(os.path.join(ARTEFACT_DIR, "svdd_model.pt"))
+    ae = Autoencoder(input_dim=18).load(os.path.join(ARTEFACT_DIR, "dedup/seed42/ae.pt"))
+    vae = VAE(input_dim=18).load(os.path.join(ARTEFACT_DIR, "dedup/seed42/vae.pt"))
+    svdd = DeepSVDD(input_dim=18).load(os.path.join(ARTEFACT_DIR, "dedup/seed42/svdd.pt"))
 
     feat_path = os.path.join(ARTEFACT_DIR, "selected_features.csv")
     features = pd.read_csv(feat_path, header=None)[0].tolist()
@@ -216,7 +216,7 @@ def run():
 
         gc.collect()
 
-    # ── 6th panel: legend, force-aligned to panel 3's x-position ──────────
+    # â”€â”€ 6th panel: legend, force-aligned to panel 3's x-position â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ax6 = axes_flat[5]
     ax3 = axes_flat[2]
     ax5 = axes_flat[4]
@@ -245,7 +245,7 @@ def run():
                fontsize=13, framealpha=0.95, edgecolor="#AAAAAA",
                title="Legend", title_fontsize=12)
 
-    out_path = os.path.join(OUT_DIR, "score_distributions_2x3.png")
+    out_path = os.path.join(OUT_DIR, "score_distributions_dedup.png")
     plt.savefig(out_path, dpi=180, bbox_inches="tight", facecolor="white")
     log.info("Saved -> %s", out_path)
     plt.close()
@@ -254,3 +254,4 @@ def run():
 
 if __name__ == "__main__":
     run()
+

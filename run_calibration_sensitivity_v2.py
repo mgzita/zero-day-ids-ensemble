@@ -1,7 +1,7 @@
 """
 run_calibration_sensitivity_v2.py
 ==================================
-Fixed version — uses same scoring pipeline as Paper 1 evaluation.
+Fixed version â€” uses same scoring pipeline as Paper 1 evaluation.
 
 Run from project root:
     python run_calibration_sensitivity_v2.py
@@ -68,7 +68,7 @@ def evaluate_at_tau(scores, y, tau):
 
 
 def load_ton_iot_raw(features, max_rows=200_000):
-    """Load CIC-ToN-IoT WITHOUT applying scaler — return raw."""
+    """Load CIC-ToN-IoT WITHOUT applying scaler â€” return raw."""
     path = os.path.join(
         PROJECT_ROOT, "data", "raw", "cic_ton_iot", "CIC-ToN-IoT.csv"
     )
@@ -149,7 +149,7 @@ def run():
         log.info("  Using keys: center_, scale_")
     else:
         # Use existing Paper 1 test results directly
-        log.info("  Cannot parse scaler keys — loading pre-scaled test data")
+        log.info("  Cannot parse scaler keys â€” loading pre-scaled test data")
         log.info("  Loading pre-processed test from existing npz files...")
 
         # Load pre-processed CIC-ToN-IoT if available
@@ -173,8 +173,11 @@ def run():
 
         # Normalise using training stats
         def norm(s):
-            mu, sigma = s.mean(), s.std() + 1e-8
-            return np.clip((s - mu) / sigma, 0, 1).astype(np.float32)
+            lo = float(np.percentile(s, 1))
+            hi = float(np.percentile(s, 99))
+            if hi - lo < 1e-8:
+                return np.zeros_like(s, dtype=np.float32)
+            return np.clip((s - lo) / (hi - lo), 0.0, 1.0).astype(np.float32)
 
         scores = 0.4*norm(s_ae) + 0.4*norm(s_vae) + 0.2*norm(s_svdd)
         _run_sensitivity(scores, y_ton)
@@ -195,8 +198,11 @@ def run():
     s_svdd = svdd.anomaly_scores(X_scaled)
 
     def norm(s):
-        mu, sigma = s.mean(), s.std() + 1e-8
-        return np.clip((s - mu) / sigma, 0, 1).astype(np.float32)
+        lo = float(np.percentile(s, 1))
+        hi = float(np.percentile(s, 99))
+        if hi - lo < 1e-8:
+            return np.zeros_like(s, dtype=np.float32)
+        return np.clip((s - lo) / (hi - lo), 0.0, 1.0).astype(np.float32)
 
     scores = 0.4*norm(s_ae) + 0.4*norm(s_vae) + 0.2*norm(s_svdd)
     log.info("  Ensemble scores: mean=%.4f  std=%.4f  "
@@ -326,3 +332,4 @@ the number of calibration flows used (Table~\\ref{{tab:cal_sensitivity}}).
 
 if __name__ == "__main__":
     run()
+

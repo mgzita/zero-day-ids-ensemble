@@ -1,4 +1,4 @@
-"""
+﻿"""
 models/vae.py
 =============
 Variational Autoencoder (VAE) for zero-day attack detection.
@@ -22,7 +22,7 @@ The VAE differs from a plain AE in two key ways:
 Anomaly detection
 -----------------
 Reconstruction error = Huber loss per sample (same as AE).
-Threshold τ = µ + 3σ computed on benign validation errors.
+Threshold Ï„ = Âµ + 3Ïƒ computed on benign validation errors.
 """
 
 import logging
@@ -129,7 +129,7 @@ def vae_loss(recon: torch.Tensor,
     huber_delta : Huber loss delta
     kl_weight   : weight on KL term (beta-VAE style, default=1.0)
 
-    Returns (total_loss, recon_loss, kl_loss) — all scalar tensors.
+    Returns (total_loss, recon_loss, kl_loss) â€” all scalar tensors.
     """
     recon_loss = nn.HuberLoss(delta=huber_delta)(recon, x)
 
@@ -225,7 +225,7 @@ class VAE:
             # Linearly increase KL weight from 0 to self.kl_weight
             kl_w = self.kl_weight * min(1.0, epoch / anneal_epochs)
 
-            # ── Train ────────────────────────────────────────────────────
+            # â”€â”€ Train â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             self.model_.train()
             train_total = train_recon = train_kl = 0.0
 
@@ -251,7 +251,7 @@ class VAE:
             train_recon /= n_train
             train_kl    /= n_train
 
-            # ── Validate ─────────────────────────────────────────────────
+            # â”€â”€ Validate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             val_total, val_recon, val_kl = self._eval_loss(val_loader)
 
             # Exponential smoothing
@@ -273,7 +273,7 @@ class VAE:
                 smoothed_val, current_lr, kl_w
             )
 
-            # ── Early stopping on smoothed val ───────────────────────────
+            # â”€â”€ Early stopping on smoothed val â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if smoothed_val < best_val_loss:
                 best_val_loss  = smoothed_val
                 patience_count = 0
@@ -303,8 +303,8 @@ class VAE:
                       n_sigma:    float = 3.0,
                       percentile: float = 99.0) -> float:
         """
-        Compute anomaly threshold τ on benign validation reconstruction errors.
-        Uses min(µ + n_sigma*σ, p99*3) to guard against inflated σ.
+        Compute anomaly threshold Ï„ on benign validation reconstruction errors.
+        Uses min(Âµ + n_sigma*Ïƒ, p99*3) to guard against inflated Ïƒ.
         """
         self._check_fitted()
         errors = self.reconstruction_error(X_val)
@@ -316,8 +316,8 @@ class VAE:
 
         self.threshold_ = min(tau_sigma, tau_pct * 3.0)
 
-        log.info("VAE errors: µ=%.4f  σ=%.4f  p99=%.4f", mu, sigma, tau_pct)
-        log.info("VAE threshold τ: sigma-based=%.4f | p99-cap=%.4f | chosen=%.4f",
+        log.info("VAE errors: Âµ=%.4f  Ïƒ=%.4f  p99=%.4f", mu, sigma, tau_pct)
+        log.info("VAE threshold Ï„: sigma-based=%.4f | p99-cap=%.4f | chosen=%.4f",
                  tau_sigma, tau_pct * 3.0, self.threshold_)
         return self.threshold_
 
@@ -330,10 +330,10 @@ class VAE:
         # Used to convert raw errors into z-scores (REN technique).
         self._check_fitted()
         errors            = self.reconstruction_error(X_train)
-        self.score_mu_    = float(errors.mean())
+        self.score_mu_ = float(errors.mean())
         self.score_sigma_ = float(errors.std()) + 1e-8
         log.info('VAE score stats: mu=%.6f  sigma=%.6f',
-                 self.score_mu_, self.score_sigma_)
+                 getattr(self, "score_mu_", None), getattr(self, "score_sigma_", None))
         return self
 
     def fit_latent_stats(self, X_train: np.ndarray) -> 'VAE':
@@ -408,8 +408,8 @@ class VAE:
     def anomaly_scores(self, X: np.ndarray) -> np.ndarray:
         # Return REN z-score anomaly scores for ensemble fusion.
         errors = self.reconstruction_error(X)
-        if self.score_mu_ is not None:
-            return (errors - self.score_mu_) / self.score_sigma_
+        if getattr(self, "score_mu_", None) is not None:
+            return (errors - getattr(self, "score_mu_", None)) / getattr(self, "score_sigma_", None)
         return errors
 
     # =========================================================================
@@ -426,10 +426,10 @@ class VAE:
             "latent_dim":       self.latent_dim,
             "huber_delta":      self.huber_delta,
             "kl_weight":        self.kl_weight,
-            "score_mu":         self.score_mu_,
-            "score_sigma":      self.score_sigma_,
-            "latent_centroid":  self.latent_centroid_,
-            "latent_inv_cov":   self.latent_inv_cov_,
+            "score_mu":         getattr(self, "score_mu_", None),
+            "score_sigma":      getattr(self, "score_sigma_", None),
+            "latent_centroid":  getattr(self, "latent_centroid_", None),
+            "latent_inv_cov":   getattr(self, "latent_inv_cov_", None),
         }, path)
         log.info("VAE saved -> '%s'", path)
 
@@ -443,8 +443,8 @@ class VAE:
                                     self.latent_dim).to(self.device)
         self.model_.load_state_dict(checkpoint["model_state"])
         self.threshold_   = checkpoint["threshold"]
-        self.score_mu_        = checkpoint.get("score_mu",        None)
-        self.score_sigma_     = checkpoint.get("score_sigma",     None)
+        self.score_mu_ = checkpoint.get("score_mu",        None)
+        self.score_sigma_ = checkpoint.get("score_sigma",     None)
         self.latent_centroid_ = checkpoint.get("latent_centroid", None)
         self.latent_inv_cov_  = checkpoint.get("latent_inv_cov",  None)
         self._fitted          = True
@@ -481,3 +481,6 @@ class VAE:
     def _check_fitted(self):
         if not self._fitted:
             raise RuntimeError("VAE not fitted. Call fit() first.")
+
+
+

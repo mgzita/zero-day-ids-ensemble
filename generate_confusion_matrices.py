@@ -6,7 +6,7 @@ Row 1: CIC-IDS2017 | CSE-CIC-IDS2018 | UNSW-NB15
 Row 2: BoT-IoT     | CIC-ToN-IoT     | [legend]
 
 Output:
-  artefacts_v2/figures/confusion_matrices_v5.png
+  artefacts_v2/figures/confusion_matrices_dedup.png
 
 Run from project root:
     python generate_confusion_matrices.py
@@ -60,32 +60,32 @@ TON_IOT_RENAME = {
 DATASETS = [
     {
         "name":     "CIC-IDS2017",
-        "subtitle": "Training-domain  |  AUC = 0.895",
-        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/test_cic17.npz",
+        "subtitle": "Training-domain (seed~42)",
+        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_cic17_dedup.npz",
         "type":     "npz",
         "color":    "#1A5276",
         "local_cal": False,
     },
     {
         "name":     "CSE-CIC-IDS2018",
-        "subtitle": "Training-domain  |  AUC = 0.942",
-        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/test_cic18.npz",
+        "subtitle": "Training-domain (seed~42)",
+        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_cic18_dedup.npz",
         "type":     "npz",
         "color":    "#1A5276",
         "local_cal": False,
     },
     {
         "name":     "UNSW-NB15",
-        "subtitle": "Training-domain  |  AUC = 0.879",
-        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/test_unsw.npz",
+        "subtitle": "Training-domain (seed~42)",
+        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_unsw_dedup.npz",
         "type":     "npz",
         "color":    "#1A5276",
         "local_cal": False,
     },
     {
         "name":     "BoT-IoT",
-        "subtitle": "Unseen zero-day  |  DR = 91.2%",
-        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/test_botiot.npz",
+        "subtitle": "Unseen zero-day  |  DR = 73.8%",
+        "path":     r"C:/MLProject/zero_day_project/artefacts_v2/dedup/test_botiot_dedup.npz",
         "type":     "npz",
         "color":    "#1A5276",
         "local_cal": False,
@@ -93,7 +93,7 @@ DATASETS = [
     },
     {
         "name":     "CIC-ToN-IoT",
-        "subtitle": "Unseen zero-day  |  AUC = 0.953",
+        "subtitle": "Unseen zero-day (seed~42)",
         "path":     r"C:/MLProject/zero_day_project/data/raw/cic_ton_iot/CIC-ToN-IoT.csv",
         "type":     "csv",
         "color":    "#1A5276",
@@ -223,9 +223,9 @@ def draw_confusion(ax, cm, ds, tau):
 def run():
     # â”€â”€ Load models â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     log.info("Loading models ...")
-    ae   = Autoencoder().load(os.path.join(ARTEFACT_DIR, "ae_model.pt"))
-    vae  = VAE().load(os.path.join(ARTEFACT_DIR, "vae_model.pt"))
-    svdd = DeepSVDD().load(os.path.join(ARTEFACT_DIR, "svdd_model.pt"))
+    ae   = Autoencoder(input_dim=18).load(os.path.join(ARTEFACT_DIR, "dedup/seed42/ae.pt"))
+    vae  = VAE(input_dim=18).load(os.path.join(ARTEFACT_DIR, "dedup/seed42/vae.pt"))
+    svdd = DeepSVDD(input_dim=18).load(os.path.join(ARTEFACT_DIR, "dedup/seed42/svdd.pt"))
 
     feat_path = os.path.join(ARTEFACT_DIR, "selected_features.csv")
     features  = pd.read_csv(feat_path, header=None)[0].tolist()
@@ -290,7 +290,7 @@ def run():
     # â”€â”€ 6th panel: text legend â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ax6 = axes_flat[5]
     ax6.set_visible(True)
-    ax6.set_facecolor('#FAFAFA')
+    ax6.set_facecolor('white')
     for spine in ax6.spines.values():
         spine.set_visible(False)
     ax6.set_xticks([])
@@ -323,9 +323,9 @@ def run():
                        linewidth=1.0),
              linespacing=1.8)
 
-    out_path = os.path.join(OUT_DIR, "confusion_matrices_v5.png")
+    out_path = os.path.join(OUT_DIR, "confusion_matrices_dedup.png")
     plt.savefig(out_path, dpi=180, bbox_inches='tight',
-                facecolor='#FAFAFA')
+                facecolor='white')
     log.info("Saved -> %s", out_path)
     plt.close()
     log.info("Done.")
@@ -333,4 +333,6 @@ def run():
 
 if __name__ == "__main__":
     run()
+
+
 

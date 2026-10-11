@@ -1,4 +1,4 @@
-"""
+﻿"""
 models/deep_svdd.py
 ===================
 Deep Support Vector Data Description (Deep SVDD).
@@ -7,15 +7,15 @@ Learns a neural network mapping that encloses normal training data
 within a minimum-volume hypersphere in latent space.
 
 Anomaly score = distance from the learned hypersphere centre.
-Attacks lie far from the centre → high score.
+Attacks lie far from the centre â†’ high score.
 
 Reference:
     Ruff et al. (2018) "Deep One-Class Classification"
     ICML 2018. https://arxiv.org/abs/1906.02629
 
 Architecture:
-    input_dim → 64 → 32 → 16 → latent_dim
-    No bias terms (standard SVDD practice — prevents hypersphere collapse)
+    input_dim â†’ 64 â†’ 32 â†’ 16 â†’ latent_dim
+    No bias terms (standard SVDD practice â€” prevents hypersphere collapse)
     LeakyReLU activations
 
 Training:
@@ -74,9 +74,9 @@ class DeepSVDD:
 
     Same interface as Autoencoder and VAE:
         fit(X_train, X_val)
-        anomaly_scores(X) → np.ndarray
+        anomaly_scores(X) â†’ np.ndarray
         fit_threshold(X_val)
-        predict(X) → np.ndarray
+        predict(X) â†’ np.ndarray
         save(path) / load(path)
     """
 
@@ -131,7 +131,7 @@ class DeepSVDD:
                  len(X_val) if X_val is not None else "None",
                  self.device)
 
-        # ── Warm-up: initialise centre from mean of initial encodings ──────
+        # â”€â”€ Warm-up: initialise centre from mean of initial encodings â”€â”€â”€â”€â”€â”€
         log.info("  Warm-up: computing hypersphere centre (%d epochs) ...",
                  self.warmup_epochs)
         self.model_.train()
@@ -149,7 +149,7 @@ class DeepSVDD:
         self.centre_ = centre.detach()
         log.info("  Centre initialised | norm=%.4f", self.centre_.norm().item())
 
-        # ── Main training ─────────────────────────────────────────────────
+        # â”€â”€ Main training â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         best_val_loss = float("inf")
         patience_count = 0
         smooth = None
@@ -211,24 +211,24 @@ class DeepSVDD:
     def fit_score_stats(self, X_train: np.ndarray) -> "DeepSVDD":
         """Fit mu/sigma of anomaly scores on benign training data (REN)."""
         scores = self._raw_distances(X_train)
-        self.score_mu_    = float(scores.mean())
+        self.score_mu_ = float(scores.mean())
         self.score_sigma_ = float(scores.std()) + 1e-8
         log.info("SVDD score stats: mu=%.6f  sigma=%.6f",
-                 self.score_mu_, self.score_sigma_)
+                 getattr(self, "score_mu_", None), getattr(self, "score_sigma_", None))
         return self
 
     def fit_threshold(self, X_val: np.ndarray,
                       percentile: float = 99.0) -> float:
-        """Set threshold as µ + n_sigma*σ on val distances."""
+        """Set threshold as Âµ + n_sigma*Ïƒ on val distances."""
         scores    = self._raw_distances(X_val)
         mu        = float(scores.mean())
         sigma     = float(scores.std())
         tau_sigma = mu + self.n_sigma * sigma
         tau_pct   = float(np.percentile(scores, percentile))
         self.threshold_ = min(tau_sigma, tau_pct * 3.0)
-        log.info("SVDD errors: µ=%.4f  σ=%.4f  p%.0f=%.4f",
+        log.info("SVDD errors: Âµ=%.4f  Ïƒ=%.4f  p%.0f=%.4f",
                  mu, sigma, percentile, tau_pct)
-        log.info("SVDD threshold τ: sigma-based=%.4f | p99-cap=%.4f | chosen=%.4f",
+        log.info("SVDD threshold Ï„: sigma-based=%.4f | p99-cap=%.4f | chosen=%.4f",
                  tau_sigma, tau_pct * 3.0, self.threshold_)
         return self.threshold_
 
@@ -257,8 +257,8 @@ class DeepSVDD:
         Falls back to raw distances if score stats not fitted.
         """
         raw = self._raw_distances(X)
-        if self.score_mu_ is not None:
-            return (raw - self.score_mu_) / self.score_sigma_
+        if getattr(self, "score_mu_", None) is not None:
+            return (raw - getattr(self, "score_mu_", None)) / getattr(self, "score_sigma_", None)
         return raw
 
     def predict(self, X: np.ndarray) -> np.ndarray:
@@ -278,8 +278,8 @@ class DeepSVDD:
             "threshold":    self.threshold_,
             "input_dim":    self.input_dim,
             "latent_dim":   self.latent_dim,
-            "score_mu":     self.score_mu_,
-            "score_sigma":  self.score_sigma_,
+            "score_mu":     getattr(self, "score_mu_", None),
+            "score_sigma":  getattr(self, "score_sigma_", None),
         }, path)
         log.info("DeepSVDD saved -> '%s'", path)
 
@@ -312,3 +312,6 @@ class DeepSVDD:
     def _check_fitted(self):
         if not self._fitted:
             raise RuntimeError("Model not fitted. Call fit() first.")
+
+
+

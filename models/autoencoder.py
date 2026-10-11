@@ -1,4 +1,4 @@
-"""
+﻿"""
 models/autoencoder.py
 =====================
 Autoencoder (AE) for zero-day attack detection.
@@ -24,7 +24,7 @@ Anomaly detection
 Reconstruction error = mean Huber loss per sample.
 Score normalisation (REN): score = (error - mu_train) / sigma_train
 Converts raw error into a z-score (dataset-agnostic).
-Threshold τ = µ + 3σ computed on normalised X_val scores.
+Threshold Ï„ = Âµ + 3Ïƒ computed on normalised X_val scores.
 """
 
 import logging
@@ -158,7 +158,7 @@ class Autoencoder:
         best_weights   = None
 
         for epoch in range(1, self.max_epochs + 1):
-            # ── Train ────────────────────────────────────────────────────
+            # â”€â”€ Train â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             self.model_.train()
             train_loss = 0.0
             for (batch,) in train_loader:
@@ -174,7 +174,7 @@ class Autoencoder:
                 train_loss += loss.item() * len(batch)
             train_loss /= len(X_train)
 
-            # ── Validate ─────────────────────────────────────────────────
+            # â”€â”€ Validate â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             val_loss = self._eval_loss(val_loader, loss_fn)
 
             # Exponential smoothing to reduce spike sensitivity
@@ -194,7 +194,7 @@ class Autoencoder:
                 smoothed_val, current_lr
             )
 
-            # ── Early stopping on SMOOTHED val loss ──────────────────────
+            # â”€â”€ Early stopping on SMOOTHED val loss â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
             if smoothed_val < best_val_loss:
                 best_val_loss  = smoothed_val
                 patience_count = 0
@@ -228,11 +228,11 @@ class Autoencoder:
         Compute anomaly threshold on benign validation reconstruction errors.
 
         Uses the HIGHER of two methods for robustness:
-          1. µ + n_sigma * σ  (paper method)
+          1. Âµ + n_sigma * Ïƒ  (paper method)
           2. percentile-based (e.g. 99th percentile of benign errors)
 
-        When σ is inflated by outliers, the percentile method acts as a
-        safety cap preventing τ from becoming unrealistically large.
+        When Ïƒ is inflated by outliers, the percentile method acts as a
+        safety cap preventing Ï„ from becoming unrealistically large.
 
         Parameters
         ----------
@@ -254,8 +254,8 @@ class Autoencoder:
         # (happens when a few outlier benign samples have extreme errors)
         self.threshold_ = min(tau_sigma, tau_pct * 3.0)
 
-        log.info("AE errors: µ=%.4f  σ=%.4f  p99=%.4f", mu, sigma, tau_pct)
-        log.info("AE threshold τ: sigma-based=%.4f | p99-cap=%.4f | chosen=%.4f",
+        log.info("AE errors: Âµ=%.4f  Ïƒ=%.4f  p99=%.4f", mu, sigma, tau_pct)
+        log.info("AE threshold Ï„: sigma-based=%.4f | p99-cap=%.4f | chosen=%.4f",
                  tau_sigma, tau_pct * 3.0, self.threshold_)
         return self.threshold_
 
@@ -375,8 +375,8 @@ class Autoencoder:
             "huber_delta":      self.huber_delta,
             "score_mu":         self.score_mu_,
             "score_sigma":      self.score_sigma_,
-            "latent_centroid":  self.latent_centroid_,
-            "latent_inv_cov":   self.latent_inv_cov_,
+            "latent_centroid":  getattr(self, "latent_centroid_", None),
+            "latent_inv_cov":   getattr(self, "latent_inv_cov_", None),
         }, path)
         log.info("AE saved -> '%s'", path)
 
@@ -427,3 +427,4 @@ class Autoencoder:
             raise RuntimeError(
                 "Autoencoder not fitted. Call fit() first."
             )
+

@@ -11,3 +11,30 @@ __pycache__/
 *.log
 pipeline_log*.txt
 artefacts_v2/checkpoints/
+
+# logs and scratch
+*.txt
+!requirements.txt
+*old.py
+*.pyold
+*1.py
+check_*.py
+fix_*.py
+diagnose_*.py
+yj_quick.py
+test_*.png
+Github.ps1
+gitupdate.ps1
+
+# separate project
+paper2/
+paper2old/
+
+# data and model files
+*.npz
+*.pt
+*.pth
+*.pkl
+*.h5
+*.joblib
+*old.png
